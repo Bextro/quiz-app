@@ -1,0 +1,18 @@
+from tkinter import *
+
+from ProjectX.login_screen import main_login_screen
+
+def coco():
+    main_screen.destroy()
+    main_login_screen()
+
+main_screen = Tk()
+main_screen.geometry("300x250")
+main_screen.title("Quiz app")
+main_label = Label(text="Want to start ?", bg="green", width="300", height="2", font=("Calibri", 13))
+main_label.pack()
+
+login_screen_button = Button(text="Start", height="2", width="30", command=coco)
+login_screen_button.pack()
+
+main_screen.mainloop()
