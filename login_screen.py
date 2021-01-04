@@ -1,12 +1,12 @@
 from tkinter import *
-import os
-from Random.level1_screen import level1
-from Random.level2_screen import level2
+import os, os.path
+from functools import partial
 
 
-def main_login_screen():
+def create_main_login_screen():
     global main_login_screen, login_button, register_button, log_reg_bet_label, login_up_label, reg_down_label
     main_login_screen = Tk()
+    center_window(main_login_screen)
     main_login_screen.geometry('600x500')
     main_login_screen.title('Login screen')
     login_up_label = Label(text="")
@@ -21,39 +21,6 @@ def main_login_screen():
     reg_down_label.pack()
 
     main_login_screen.mainloop()
-
-
-def level_screen():
-    # global level_screen
-    # level_screen = Tk()
-    # level_screen.geometry('600x500')
-    # level_screen.title('Loggedin screen')
-    Label(text="Welcome {} !!!".format(username1), font=("calibri", 28)).pack()
-    # scrollbar = Scrollbar(main_login_screen)
-    # scrollbar.pack(side=RIGHT, fill=Y)
-    back_button = Button(text="|BACK|", height="1", width="15")  # ,command=back_to_main_screen)
-    back_button.pack(anchor="w", side="top")
-    level_1_button = Button(text="|LEVEL 1|", height="2", width="30", command=lvl1)
-    level_1_button.pack()
-    Label(text="").pack()
-    level_2_button = Button(text="|LEVEL 2|", height="2", width="30", command=lvl2)
-    level_2_button.pack()
-    Label(text="").pack()
-
-
-def lvl1():
-    main_login_screen.destroy()
-    level1()
-
-
-def lvl2():
-    main_login_screen.destroy()
-    level2()
-
-
-# def back_to_main_screen():
-# level_screen.destroy()
-# main_login_screen()
 
 
 def register():
@@ -187,7 +154,8 @@ def register_user():
     password_entry.delete(0, END)
 
     Label(register_screen, text="Registration Success", fg="green", font=("calibri", 11)).pack()
-    register_screen.after(3000, comander)
+    register_screen.after(3000, destroy_reg_screen_and_open_log)
+
 
 def login_verify():
     global username1
@@ -201,7 +169,7 @@ def login_verify():
         file1 = open(username1, "r")
         verify = file1.read().splitlines()
         if password1 in verify:
-            login_sucess()
+            login_success()
 
         else:
             password_not_recognised()
@@ -210,15 +178,14 @@ def login_verify():
         user_not_found()
 
 
-def login_sucess():
+def login_success():
     login_screen.destroy()
     register_button.pack_forget()
     login_button.pack_forget()
     login_up_label.pack_forget()
     log_reg_bet_label.pack_forget()
     reg_down_label.pack_forget()
-    # main_login_screen.destroy()
-    level_screen()
+    show_level_screen()
 
 
 def password_not_recognised():
@@ -246,5 +213,82 @@ def delete_password_not_recognised():
 def delete_user_not_found_screen():
     user_not_found_screen.destroy()
 
-def comander():
-    register_screen.destroy
+
+def destroy_reg_screen_and_open_log():
+    register_screen.destroy()
+    login()
+
+
+def show_level_screen():
+    path = "C://Users/user/PycharmProjects/pythonProject2/Levels/"
+    levels_count = len([f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))])
+    print(levels_count)
+    for level in range(1, levels_count + 1):
+        button = Button(text='{}'.format(level), command=partial(show_level_questions, level))
+        button.pack()
+
+
+def show_level_questions(level_number):
+    filename = 'Level{}.txt'.format(level_number)
+    path = "C://Users/user/PycharmProjects/pythonProject2/Levels/"
+    file = open(path + filename, 'r')
+    line = file.readline()
+    main_login_screen.destroy()
+    questions_count = 0
+    while line != "":
+        questions_count += 1
+        question = line
+        print(question)
+        answers = []
+        for i in range(4):
+            answers.append(file.readline())
+        print(answers)
+        correct_answer = file.readline()
+        print(correct_answer)
+        line = file.readline()
+
+        show_level_question(question, answers, int(correct_answer))
+    file.close()
+
+
+def show_level_question(question, answers, correct_answer):
+    print('show_level_question')
+    new_window = Tk()
+    center_window(new_window)
+    Label(new_window, text=question).pack()
+
+    buttons = []
+    for i in range(0, 4):
+        print('created new button')
+        button = Button(new_window, text=answers[i],
+                        command=partial(check_answer, i,
+                                        correct_answer, new_window)).pack()
+        buttons.append(button)
+    new_window.mainloop()
+    return new_window
+
+
+def check_answer(user_answer, correct_answer, question_window):
+    if user_answer == correct_answer:
+        label = Label(question_window, text='Your answer is correct').pack()
+    else:
+        label = Label(question_window, text='Your answer is wrong').pack()
+    question_window.destroy()
+
+
+def center_window(window, width= 600, height=500):
+        screen_width = window.winfo_screenwidth()
+        screen_height = window.winfo_screenheight()
+        x = (screen_width / 2) - (width / 2)
+        y = (screen_height / 2) - (height / 2)
+        window.geometry('%dx%d+%d+%d' % (width, height, x, y))
+
+# 1. 1 saat
+# muellimin suallari elave etmek uchun pencere yaradirsan
+# her entry novu uchun label olmalidir
+# create new level
+# 1. sual (entry)
+# 2. variantlari doldurur (entryler)
+# 3. duzgun suali qeyd edir (entry)
+# 4. yadda saxla
+# 5. Add button

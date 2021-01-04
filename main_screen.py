@@ -1,12 +1,14 @@
 from tkinter import *
 
-from ProjectX.login_screen import main_login_screen
+from ProjectX.login_screen import create_main_login_screen, center_window
+
 
 def coco():
     main_screen.destroy()
-    main_login_screen()
+    create_main_login_screen()
 
 main_screen = Tk()
+center_window(main_screen)
 main_screen.geometry("300x250")
 main_screen.title("Quiz app")
 main_label = Label(text="Want to start ?", bg="green", width="300", height="2", font=("Calibri", 13))
